@@ -1,0 +1,22 @@
+{
+  "WB123456789": {
+    "status": "In Transit",
+    "progress": 60,
+    "origin": "Shanghai, China",
+    "destination": "New York, USA",
+    "estimatedDelivery": "May 15, 2023",
+    "weight": "5.2 kg",
+    "lastUpdate": "May 10, 2023 - 14:30 GMT",
+    "currentLocation": "In transit to destination"
+  },
+  "WB987654321": {
+    "status": "Delivered",
+    "progress": 100,
+    "origin": "London, UK",
+    "destination": "Berlin, Germany",
+    "estimatedDelivery": "April 28, 2023",
+    "weight": "2.1 kg",
+    "lastUpdate": "April 27, 2023 - 09:15 GMT",
+    "currentLocation": "Delivered to recipient"
+  }
+}

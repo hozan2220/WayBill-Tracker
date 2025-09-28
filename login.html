@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Waybill Tracker - Login</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkfFlJ5q5M5C7pldQn9j6LZp9+8nbTov4+1HjA9d1R2L9xX8C4Z8aI2mw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+	<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+	<style>
+		* { box-sizing: border-box; }
+		body { margin: 0; font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; background: #0f172a; color: #e2e8f0; }
+		.container { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; }
+		.card { width: 100%; max-width: 420px; background: #0b1220; border: 1px solid #1f2a44; border-radius: 12px; padding: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.4); }
+		.title { margin: 0 0 8px 0; font-size: 20px; font-weight: 700; color: #f8fafc; display: flex; align-items: center; gap: 8px; }
+		.subtitle { margin: 0 0 20px 0; font-size: 13px; color: #94a3b8; }
+		.form-group { margin-bottom: 14px; }
+		label { display: block; margin-bottom: 6px; font-size: 13px; color: #cbd5e1; }
+		input { width: 100%; padding: 12px 12px; border: 1px solid #1f2a44; background: #0a1020; color: #e2e8f0; border-radius: 8px; outline: none; transition: border-color .2s; }
+		input:focus { border-color: #f97316; }
+		.actions { display: flex; gap: 10px; align-items: center; margin-top: 8px; }
+		.btn { appearance: none; border: 0; background: #f97316; color: #0b1220; padding: 10px 16px; font-weight: 700; border-radius: 8px; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; }
+		.btn:disabled { opacity: 0.6; cursor: not-allowed; }
+		.btn-outline { background: transparent; color: #e2e8f0; border: 1px solid #1f2a44; }
+		.message { margin-top: 12px; font-size: 13px; padding: 10px 12px; border-radius: 8px; display:none; }
+		.message.success { background: #052e1a; color: #86efac; border: 1px solid #166534; display:block; }
+		.message.error { background: #3b0a0a; color: #fecaca; border: 1px solid #7f1d1d; display:block; }
+	</style>
+</head>
+<body>
+	<div class="container">
+		<div class="card">
+    <h1 class="title"><i class="fas fa-truck-fast"></i> Waybill Tracker</h1>
+    <p class="subtitle" id="formSubtitle">Sign in to your account</p>
+    
+    <!-- Login Form (default) -->
+    <form id="loginForm" class="auth-form">
+        <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" id="email" placeholder="you@example.com" required />
+        </div>
+        <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" id="password" placeholder="••••••••" required />
+        </div>
+        <div class="actions">
+            <button type="submit" class="btn"><i class="fas fa-sign-in-alt"></i> Login</button>
+            <button type="button" id="switchToSignup" class="btn btn-outline">Create Account</button>
+        </div>
+    </form>
+
+    <!-- Signup Form (hidden by default) -->
+    <form id="signupForm" class="auth-form" style="display: none;">
+        <div class="form-group">
+            <label for="signupEmail">Email</label>
+            <input type="email" id="signupEmail" placeholder="you@example.com" required />
+        </div>
+        <div class="form-group">
+            <label for="signupDisplayName">Display Name</label>
+            <input type="text" id="signupDisplayName" placeholder="Your full name" required />
+        </div>
+        <div class="form-group">
+            <label for="signupPassword">Password</label>
+            <input type="password" id="signupPassword" placeholder="••••••••" required />
+        </div>
+        <div class="actions">
+            <button type="submit" class="btn"><i class="fas fa-user-plus"></i> Create Account</button>
+            <button type="button" id="switchToLogin" class="btn btn-outline">Back to Login</button>
+        </div>
+    </form>
+
+    <div id="msg" class="message"></div>
+</div>
+	</div>
+
+<script>
+const SUPABASE_URL = 'https://adqkysthhxqeokcihffg.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFkcWt5c3RoaHhxZW9rY2loZmZnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg4NzM5NzgsImV4cCI6MjA3NDQ0OTk3OH0.W9DoajEfc4VL-uvI2w717PBugd1yTE2HjODOkBHHcaM';
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, { 
+    auth: { persistSession: true, autoRefreshToken: true } 
+});
+
+// Email domain validation function
+function validateEmailDomain(email) {
+    const allowedDomain = '@drd-me.org';
+    if (!email.endsWith(allowedDomain)) {
+        return {
+            valid: false,
+            message: `Only ${allowedDomain} email addresses are allowed to access this system.`
+        };
+    }
+    return { valid: true };
+}
+
+function showMessage(text, type) {
+    const el = document.getElementById('msg');
+    el.textContent = text;
+    el.className = 'message ' + (type || '');
+}
+
+function switchToSignup() {
+    document.getElementById('loginForm').style.display = 'none';
+    document.getElementById('signupForm').style.display = 'block';
+    document.getElementById('formSubtitle').textContent = 'Create a new account';
+    showMessage('', ''); // Clear any messages
+}
+
+function switchToLogin() {
+    document.getElementById('signupForm').style.display = 'none';
+    document.getElementById('loginForm').style.display = 'block';
+    document.getElementById('formSubtitle').textContent = 'Sign in to your account';
+    showMessage('', ''); // Clear any messages
+}
+
+// Login Form Handler
+document.getElementById('loginForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const email = (document.getElementById('email').value || '').trim();
+    const password = document.getElementById('password').value;
+    
+    if (!email || !password) { 
+        showMessage('Email and password are required', 'error'); 
+        return; 
+    }
+
+    // Add domain validation
+    const domainCheck = validateEmailDomain(email);
+    if (!domainCheck.valid) {
+        showMessage(domainCheck.message, 'error');
+        return;
+    }
+
+    const loginBtn = document.querySelector('#loginForm .btn');
+    const originalText = loginBtn.innerHTML;
+    loginBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Signing in...';
+    loginBtn.disabled = true;
+
+    try {
+        const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+        if (error) { 
+            showMessage(error.message || 'Login failed', 'error');
+            return; 
+        }
+        showMessage('Login successful. Redirecting...', 'success');
+        setTimeout(() => { window.location.replace('/app'); }, 500);
+    } catch (error) {
+        showMessage('Login failed. Please try again.', 'error');
+    } finally {
+        loginBtn.innerHTML = originalText;
+        loginBtn.disabled = false;
+    }
+});
+
+// Signup Form Handler
+document.getElementById('signupForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const email = (document.getElementById('signupEmail').value || '').trim();
+    const displayName = (document.getElementById('signupDisplayName').value || '').trim();
+    const password = document.getElementById('signupPassword').value;
+    
+    if (!email || !password || !displayName) { 
+        showMessage('Email, password, and display name are required', 'error'); 
+        return; 
+    }
+
+    // Add domain validation
+    const domainCheck = validateEmailDomain(email);
+    if (!domainCheck.valid) {
+        showMessage(domainCheck.message, 'error');
+        return;
+    }
+
+    const signupBtn = document.querySelector('#signupForm .btn');
+    const originalText = signupBtn.innerHTML;
+    signupBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating account...';
+    signupBtn.disabled = true;
+
+    try {
+        const { data, error } = await supabase.auth.signUp({ 
+            email, 
+            password,
+            options: {
+                data: {
+                    display_name: displayName
+                }
+            }
+        });
+        
+        if (error) { 
+            showMessage(error.message || 'Signup failed', 'error');
+            return; 
+        }
+        
+        showMessage('Account created! Check your email for confirmation, then login.', 'success');
+        // Switch back to login form after successful signup
+        setTimeout(switchToLogin, 2000);
+    } catch (error) {
+        showMessage('Signup failed. Please try again.', 'error');
+    } finally {
+        signupBtn.innerHTML = originalText;
+        signupBtn.disabled = false;
+    }
+});
+
+// Form switching
+document.getElementById('switchToSignup').addEventListener('click', switchToSignup);
+document.getElementById('switchToLogin').addEventListener('click', switchToLogin);
+
+// Handle auth state changes
+supabase.auth.onAuthStateChange((event, session) => {
+    if (event === 'SIGNED_IN' && session) {
+        window.location.replace('/app');
+    }
+});
+
+document.addEventListener('DOMContentLoaded', async () => {
+    // Check if user is already authenticated
+    const { data } = await supabase.auth.getSession();
+    if (data && data.session) {
+        if (!window.location.pathname.includes('/app')) {
+            window.location.replace('/app');
+        }
+    }
+});
+
+// Handle Enter key for form submission
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+        const activeForm = document.getElementById('loginForm').style.display !== 'none' ? 
+            'loginForm' : 'signupForm';
+        document.querySelector(`#${activeForm} .btn`).click();
+    }
+});
+</script>
+</body>
+</html>
