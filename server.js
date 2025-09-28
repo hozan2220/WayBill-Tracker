@@ -9,7 +9,7 @@ const nodemailer = require('nodemailer');
 dotenv.config();
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 const SUPABASE_URL = process.env.SUPABASE_URL || 'https://adqkysthhxqeokcihffg.supabase.co';
 const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFkcWt5c3RoaHhxZW9rY2loZmZnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg4NzM5NzgsImV4cCI6MjA3NDQ0OTk3OH0.W9DoajEfc4VL-uvI2w717PBugd1yTE2HjODOkBHHcaM';
 const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFkcWt5c3RoaHhxZW9rY2loZmZnIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1ODg3Mzk3OCwiZXhwIjoyMDc0NDQ5OTc4fQ.GVpFUK6Ck3NyRPyYpiBMsAlMyjYKrkZQUtsrPYG3h0Y';
