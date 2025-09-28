@@ -280,7 +280,14 @@ function mapWaybillRowToClient(row) {
 }
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: [
+    process.env.FRONTEND_URL || 'http://localhost:3000',
+    'https://*.onrender.com'
+  ],
+  methods: ['GET', 'POST', 'OPTIONS', 'HEAD', 'DELETE'],
+  credentials: true
+}));
 app.use(express.json());
 app.use(express.static('.'));
 // Get all users for recipient dropdown
