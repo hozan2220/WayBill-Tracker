@@ -1601,28 +1601,33 @@ async function startServer() {
     try {
         await initializeDataFiles();
         
-        app.listen(PORT, '0.0.0.0', () => {
-            console.log(`🚀 Waybill Tracker Server running on http://localhost:${PORT}`);
-            console.log(`📁 Data file: ${DATA_FILE}`);
-            console.log(`📁 Archive file: ${ARCHIVE_FILE}`);
-            console.log(`🌐 Open http://localhost:${PORT} in your browser`);
-            console.log(`📱 Mobile access: Use your computer's IP address instead of localhost`);
-            console.log('\nAPI Endpoints:');
-            console.log('  GET    /api/waybills           - Get all waybills');
-            console.log('  GET    /api/waybills/archived  - Get archived waybills');
-            console.log('  GET    /api/waybills/:id       - Get waybill by ID');
-            console.log('  GET    /api/waybills/search/:query - Search waybills');
-            console.log('  GET    /api/waybills/:id/invoice - Generate waybill invoice');
-            console.log('  POST   /api/waybills           - Create new waybill');
-            console.log('  POST   /api/waybills/:id/archive - Archive waybill (delivered only)');
-            console.log('  POST   /api/waybills/:id/restore - Restore archived waybill');
-            console.log('  PUT    /api/waybills/:id       - Update entire waybill');
-            console.log('  PATCH  /api/waybills/:id/status - Update waybill status only');
-            console.log('  GET    /api/waybills/:id/tracking - Get tracking history');
-            console.log('  DELETE /api/waybills/:id       - Delete waybill');
-            console.log('  GET    /api/export/archived    - Export archived waybills to Excel');
-            console.log('  GET    /api/stats              - Get statistics');
-        });
+app.listen(PORT, '0.0.0.0', () => {
+    console.log(`🚀 Waybill Tracker Server running on port ${PORT}`);
+    console.log(`📁 Data file: ${DATA_FILE}`);
+    console.log(`📁 Archive file: ${ARCHIVE_FILE}`);
+    
+    // Only show localhost URLs in development
+    if (process.env.NODE_ENV !== 'production') {
+        console.log(`🌐 Open http://localhost:${PORT} in your browser`);
+        console.log(`📱 Mobile access: Use your computer's IP address instead of localhost`);
+    }
+    
+    console.log('\nAPI Endpoints:');
+    console.log('  GET    /api/waybills           - Get all waybills');
+    console.log('  GET    /api/waybills/archived  - Get archived waybills');
+    console.log('  GET    /api/waybills/:id       - Get waybill by ID');
+    console.log('  GET    /api/waybills/search/:query - Search waybills');
+    console.log('  GET    /api/waybills/:id/invoice - Generate waybill invoice');
+    console.log('  POST   /api/waybills           - Create new waybill');
+    console.log('  POST   /api/waybills/:id/archive - Archive waybill (delivered only)');
+    console.log('  POST   /api/waybills/:id/restore - Restore archived waybill');
+    console.log('  PUT    /api/waybills/:id       - Update entire waybill');
+    console.log('  PATCH  /api/waybills/:id/status - Update waybill status only');
+    console.log('  GET    /api/waybills/:id/tracking - Get tracking history');
+    console.log('  DELETE /api/waybills/:id       - Delete waybill');
+    console.log('  GET    /api/export/archived    - Export archived waybills to Excel');
+    console.log('  GET    /api/stats              - Get statistics');
+});
     } catch (error) {
         console.error('Failed to start server:', error);
         process.exit(1);
