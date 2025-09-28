@@ -37,7 +37,8 @@ const emailTransporter = nodemailer.createTransport(emailConfig);
 // Verify email connection on startup
 emailTransporter.verify(function(error, success) {
     if (error) {
-        console.error('Email transporter verification failed:', error);
+        console.error('⚠️ Email transporter verification failed:', error.message);
+        console.log('📧 Email notifications will be disabled, but the app will continue to work');
     } else {
         console.log('✅ Email transporter is ready to send messages');
     }
@@ -118,12 +119,18 @@ async function sendWaybillCreationEmail(waybill) {
             `
         };
 
-        const info = await emailTransporter.sendMail(mailOptions);
+                const info = await Promise.race([
+            emailTransporter.sendMail(mailOptions),
+            new Promise((_, reject) => 
+                setTimeout(() => reject(new Error('Email timeout')), 10000)
+            )
+        ]);
+        
         console.log(`✅ Waybill creation email sent to ${waybill.recipient}: ${info.messageId}`);
         return true;
     } catch (error) {
-        console.error('❌ Failed to send waybill creation email:', error);
-        return false;
+        console.error('⚠️ Failed to send waybill creation email:', error.message);
+        return false; // Don't throw, just return false
     }
 }
 // Function to send delivery confirmation email
